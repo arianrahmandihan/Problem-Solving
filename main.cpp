@@ -1,52 +1,128 @@
 #include <iostream>
-#include <conio.h>
+#include <fstream>
+#include <string.h>
+
 using namespace std;
+
+const char ops[] = {'+','-','*','/','='};
+const string opNames[] = {"addition","subtraction","multiplication","division","assignment"};
+
+string userDef[100];
+int indexUserDef = -1;
+
+string operators[100];
+int indexOperators = -1;
+
+bool isStringInArray(string str,string arr[],int length)
+{
+    for(int i=0; i<length; ++i)
+    {
+        if(arr[i]==str)
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool isCharInArray(char arr[],int length, char c)
+{
+    for(int i=0; i<length; ++i)
+    {
+        if(arr[i]==c)
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool isOperator(char c)
+{
+    for(int i=0;i<5;++i){
+        if(c==ops[i]){
+            return true;
+        }
+    }
+    return false;
+}
+
+string getOperatorName(char c)
+{
+    if(isOperator(c)){
+        for(int i=0;i<5;++i){
+            if(c==ops[i]){
+                return opNames[i];
+            }
+        }
+    }
+    return "Not an operator";
+}
+
+void findOperators(string line)
+{
+    int length = line.length();
+    for(int i=0;i<length;++i){
+        if(isOperator(line[i])){
+            if(!isStringInArray(getOperatorName(line[i]),operators,indexOperators+1)){
+                operators[++indexOperators] = getOperatorName(line[i]);
+            }
+        }
+    }
+
+}
+
+void findUserDefinedFunction(string line)
+{
+    string word = "";
+    int length = line.length();
+    for(int i=0; i<length; ++i)
+    {
+        if(line[i]!=' ')
+        {
+            word += line[i];
+        }
+        else
+        {
+            if(word.find('(')<length)
+            {
+                if(!isStringInArray(word.substr(0,word.find('(')),userDef,indexUserDef+1))
+                {
+                    userDef[++indexUserDef] = word.substr(0,word.find('('));
+                }
+            }
+            word = "";
+        }
+    }
+}
+
 int main()
 {
-    int i,len;
-    cout<<"Enter the Array length: ";
-      cin>>len;
-      char arr2[30]={"abcccc"};
-    int arr[len];
-      cout<<"\n";
-       cout<<"Enter the Number for array :";
-    for(i=0; i<len; i++){
-      cin>>arr[i];
-     cin>> arr[0]='a';
-     cin>> arr[1]='b';
-     cin>> arr[2]='c';
+    string myText;
+    string lines[100];
+    ifstream MyReadFile("program.cpp");
+    int lineIndex = -1;
+    while (getline (MyReadFile, myText))
+    {
+        lines[++lineIndex] = myText;
     }
-
-      for(i=0; i<len; i++){
-      cout<<arr[i];
-      cout<<("\n");
+    MyReadFile.close();
+    for(int i=0; i<=lineIndex; ++i)
+    {
+        findUserDefinedFunction(lines[i]);
+        findOperators(lines[i]);
     }
-getch();
-if(arr[i]==arr2[j])
-        {
-            temp=i+1;
-            while(arr[i]==arr2[j])
-            {
-                i++;
-                j++;
-            }
+    for(int i=0; i<=indexUserDef; ++i)
+    {
+        cout<<"Function-"<<i+1<<":"<<userDef[i]<<endl;
+    }
+    cout<<"Total number of user defined function: "<<indexUserDef+1<<endl;
 
-            if(arr2[j]=='\0')
-            {
-                cout<<"This is matched"<<temp;
-                exit(0);
-            }
-            else
-            {
-                i=temp;
-                temp=0;
-            }
-
-
-
-if(temp==0)
-        cout<<"This is not matched"<<temp;;
-
-
+    for(int i=0; i<=indexOperators; ++i)
+    {
+        cout<<"Operator-"<<i+1<<":"<<operators[i]<<endl;
+    }
+    cout<<"Total number of the operators: "<<indexOperators+1<<endl;
     return 0;
 }
+
